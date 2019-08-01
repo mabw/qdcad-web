@@ -2,15 +2,23 @@
   <div class="bills-container">
     <div class="bills-title">
       <div>
-        <el-button type="text" @click="handleShowFilter">展开/折叠筛选条件</el-button>
+        <el-button type="text" @click="handleShowFilter"
+          >展开/折叠筛选条件</el-button
+        >
       </div>
       <div>
         <strong>运输计划</strong>
       </div>
       <div>
-        <el-button type="primary" icon="el-icon-edit" size="small">新增出口计划</el-button>
-        <el-button type="primary" icon="el-icon-edit" size="small">新增进口计划</el-button>
-        <el-button type="primary" icon="el-icon-download" size="small">导出Excel</el-button>
+        <el-button type="primary" icon="el-icon-edit" size="small"
+          >新增出口计划</el-button
+        >
+        <el-button type="primary" icon="el-icon-edit" size="small"
+          >新增进口计划</el-button
+        >
+        <el-button type="primary" icon="el-icon-download" size="small"
+          >导出Excel</el-button
+        >
       </div>
     </div>
     <div class="bills-filter" v-show="showFilter">
@@ -31,7 +39,12 @@
         class="input-with-select"
         clearable
       >
-        <el-select v-model="searchType" slot="prepend" placeholder="请选择" class="bill-search-type">
+        <el-select
+          v-model="searchType"
+          slot="prepend"
+          placeholder="请选择"
+          class="bill-search-type"
+        >
           <el-option label="当前页搜索" value="a1"></el-option>
           <el-option label="全站搜索" value="a2"></el-option>
         </el-select>
@@ -97,7 +110,9 @@
           :value="item.value"
         ></el-option>
       </el-select>
-      <el-button type="primary" icon="el-icon-edit" size="small">清除所有筛选条件</el-button>
+      <el-button type="primary" icon="el-icon-edit" size="small"
+        >清除所有筛选条件</el-button
+      >
     </div>
     <div class="bills-list">list</div>
   </div>
@@ -187,4 +202,3 @@ export default {
   height: 100vh;
 }
 </style>
-
