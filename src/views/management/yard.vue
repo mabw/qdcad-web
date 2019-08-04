@@ -12,15 +12,26 @@
       </span>
     </template>
     <template>
-      <el-form status-icon :inline="true" :rules="rules" ref="formInline" :model="formInline">
+      <el-form
+        status-icon
+        :inline="true"
+        :rules="rules"
+        ref="formInline"
+        :model="formInline"
+      >
         <el-form-item label="场站名称" prop="yard">
           <el-input v-model="formInline.yard" placeholder="场站名称"></el-input>
         </el-form-item>
         <el-form-item label="场站标识符" prop="yard">
-          <el-input v-model="formInline.yard" placeholder="场站标识符"></el-input>
+          <el-input
+            v-model="formInline.yard"
+            placeholder="场站标识符"
+          ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSaveData('formInline')">增加</el-button>
+          <el-button type="primary" @click="handleSaveData('formInline')"
+            >增加</el-button
+          >
         </el-form-item>
       </el-form>
     </template>
@@ -58,5 +69,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
