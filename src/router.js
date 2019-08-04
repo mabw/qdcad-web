@@ -24,7 +24,7 @@ export default new Router({
         },
         {
           path: "management",
-          component: () => import("./views/management/Management.vue")
+          component: () => import("./views/management/index.vue")
         }
       ]
     },

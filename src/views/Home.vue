@@ -1,5 +1,5 @@
 <template>
-  <el-container class="main-container">
+  <div>
     <el-header class="nav-menu-container">
       <div class="logo-title">青岛畅安达货运管理平台</div>
       <el-menu
@@ -45,7 +45,7 @@
     <el-main class="main-body">
       <router-view />
     </el-main>
-  </el-container>
+  </div>
 </template>
 
 <script>
