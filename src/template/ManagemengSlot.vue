@@ -6,6 +6,7 @@
     <div class="info">
       <slot name="info"></slot>
     </div>
+    <slot name="list" class="list"></slot>
     <div class="content">
       <slot></slot>
     </div>
@@ -25,7 +26,10 @@
   border-radius: 4px;
   background: $grey;
 }
+.list {
+  margin: 16px;
+}
 .content {
-  margin: 32px 0;
+  margin: 16px 0;
 }
 </style>

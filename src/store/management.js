@@ -34,7 +34,7 @@ const getters = {
     let newState = {};
     if (state.data) {
       state.data.forEach(item => {
-        newState[`${item.type}`] = item.content;
+        newState[`${item.type}`] = item.content.data;
       });
     }
     return newState;

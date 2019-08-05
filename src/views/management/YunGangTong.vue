@@ -6,26 +6,15 @@
     <template #info>
       <span>需要正确的云港通账号来保证测温、船期查询的正常运行</span>
     </template>
-    <el-form
-      status-icon
-      :inline="true"
-      :rules="rules"
-      ref="formInline"
-      :model="formInline"
-    >
+    <el-form status-icon :inline="true" :rules="rules" ref="formInline" :model="formInline">
       <el-form-item label="云港通账号" prop="user">
         <el-input v-model="formInline.user" placeholder="云港通账号"></el-input>
       </el-form-item>
       <el-form-item label="云港通密码" prop="password">
-        <el-input
-          v-model="formInline.password"
-          placeholder="云港通密码"
-        ></el-input>
+        <el-input v-model="formInline.password" placeholder="云港通密码"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="handleSaveData('formInline')"
-          >保存</el-button
-        >
+        <el-button type="primary" @click="handleSaveData('formInline')">保存</el-button>
       </el-form-item>
     </el-form>
   </management-slot>
@@ -73,7 +62,7 @@ export default {
           const { user, password } = this.formInline;
           const payload = {
             type: "yun_gang_tong",
-            content: { user, password }
+            content: { data: { user, password } }
           };
           this.$store.dispatch("management/saveConfigurations", payload);
         }
