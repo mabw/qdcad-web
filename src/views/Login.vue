@@ -10,11 +10,7 @@
         class="login-form"
       >
         <el-form-item label="用户名">
-          <el-select
-            v-model="ruleForm.userName"
-            placeholder="请选择"
-            prop="userName"
-          >
+          <el-select v-model="ruleForm.userName" placeholder="请选择" prop="userName">
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -24,17 +20,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="密码">
-          <el-input
-            type="password"
-            prop="password"
-            v-model="ruleForm.Password"
-            autocomplete="off"
-          ></el-input>
+          <el-input type="password" prop="password" v-model="ruleForm.Password" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('ruleForm')"
-            >登陆</el-button
-          >
+          <el-button type="primary" @click="submitForm('ruleForm')">登陆</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -78,8 +67,8 @@ export default {
         password: ""
       },
       rules: {
-        userName: [{ validator: validateUserName, trigger: "blur" }],
-        password: [{ validator: validatePassword, trigger: "blur" }]
+        userName: [{ validator: validateUserName, trigger: "change" }],
+        password: [{ validator: validatePassword, trigger: "change" }]
       },
       options: [
         {

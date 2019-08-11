@@ -38,14 +38,14 @@ export default {
       },
       rules: {
         user: [
-          { required: true, message: "请输入云港通账号", trigger: "blur" },
+          { required: true, message: "请输入云港通账号", trigger: "change" },
           { len: 11, message: "手机号位数不正确" }
         ],
         password: [
           {
             required: true,
             message: "请输入云港通密码",
-            trigger: "blur"
+            trigger: "change"
           },
           { max: 25, min: 6, message: "长度必须处于6到25位之间" }
         ]

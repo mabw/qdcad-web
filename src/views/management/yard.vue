@@ -22,6 +22,7 @@
                 v-model="edittingData"
                 size="mini"
                 placeholder="场站名称"
+                ref="scope.$index.toString()"
                 @keyup.native.13="handleUpdateYard(scope.$index, scope.row)"
               ></el-input>
             </div>
@@ -87,8 +88,12 @@ export default {
         identity: ""
       },
       rules: {
-        name: [{ required: true, message: "请输入场站名称", trigger: "blur" }],
-        identity: [{ required: true, message: "请输入标识符", trigger: "blur" }]
+        name: [
+          { required: true, message: "请输入场站名称", trigger: "change" }
+        ],
+        identity: [
+          { required: true, message: "请输入标识符", trigger: "change" }
+        ]
       }
     };
   },
@@ -96,21 +101,24 @@ export default {
     handleEditYard(index, data) {
       this.edittingIndex = index;
       this.edittingData = data.name;
+      console.log(this.$refs);
     },
     handleUpdateYard(index, data) {
-      const content = JSON.parse(JSON.stringify(this.configurations.yard)).map(
-        item => {
+      if (this.edittingData !== data.name) {
+        const content = JSON.parse(
+          JSON.stringify(this.configurations.yard)
+        ).map(item => {
           if (item.identity === data.identity) {
             item.name = this.edittingData;
           }
           return item;
-        }
-      );
-      const payload = {
-        type: "yard",
-        content: { data: content }
-      };
-      this.$store.dispatch("management/saveConfigurations", payload);
+        });
+        const payload = {
+          type: "yard",
+          content: { data: content }
+        };
+        this.$store.dispatch("management/saveConfigurations", payload);
+      }
       this.edittingIndex = null;
       this.edittingData = null;
     },

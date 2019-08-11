@@ -31,7 +31,6 @@ import YunGangTong from "./YunGangTong";
 import ContainerSpec from "./ContainerSpec";
 import YardList from "./yard";
 import ClientNameList from "./ClientName";
-import API from "@utils/apiService";
 
 export default {
   components: {

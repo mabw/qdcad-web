@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Bills from "./views/bills/Bills.vue";
+import BillList from "./views/bills";
 import Home from "./views/Home.vue";
 
 Vue.use(Router);
@@ -13,7 +13,7 @@ export default new Router({
       path: "/",
       component: Home,
       children: [
-        { path: "/", component: Bills },
+        { path: "/", component: BillList },
         {
           path: "collected",
           component: () => import("./views/collected/Collected.vue")
