@@ -10,6 +10,7 @@
   "dependencies": {
     "apisauce": "^1.0.3",
     "core-js": "^2.6.5",
+    "dayjs": "^1.8.15",
     "element-ui": "^2.11.1",
     "ramda": "^0.26.1",
     "vue": "^2.6.10",

@@ -19,7 +19,12 @@
         <el-col :span="9">
           <el-tooltip effect="dark" content="输入提单号，失去焦点后会自动查询是否有重复提单记录" placement="top">
             <el-form-item label="提 单 号" :label-width="formLabelWidth" prop="bill">
-              <el-input v-model="billComputed" placeholder="请填写提单号" clearable></el-input>
+              <el-input
+                v-model="billComputed"
+                placeholder="请填写提单号"
+                clearable
+                @blur="handleBlurAndCheck"
+              ></el-input>
             </el-form-item>
           </el-tooltip>
         </el-col>
@@ -27,7 +32,7 @@
           <el-button class="w-100" type="success" icon="el-icon-search" @click="closeModal">查询提单信息</el-button>
         </el-col>
         <el-col :span="7">
-          <el-alert close-text="知道了" :closable="false">
+          <el-alert close-text="知道了" v-if="info" :closable="false" v-html="info">
             {{info}}
             <br />
             {{info}}
@@ -169,11 +174,33 @@
 
 <script>
 import API from "@utils/apiService";
+import dayjs from "dayjs";
 
 export default {
   props: ["status", "direction"],
   data() {
+    const checkAssignTime = (_, value, callback) => {
+      if (!value) {
+        return callback(new Error("请选择派车时间"));
+      } else if (dayjs(value).isAfter(dayjs(this.form.arrivalTime))) {
+        return callback(new Error("派车日期不能晚于到厂日期"));
+      } else if (this.form.arrivalTime) {
+        this.$refs["form"].clearValidate("arrivalTime");
+      }
+      callback();
+    };
+    const checkArrivalTime = (_, value, callback) => {
+      if (!value) {
+        return callback(new Error("请选择到厂时间"));
+      } else if (dayjs(value).isBefore(dayjs(this.form.assignTime))) {
+        return callback(new Error("到厂日期不能早于派车日期"));
+      } else if (this.form.assignTime) {
+        this.$refs["form"].clearValidate("assignTime");
+      }
+      callback();
+    };
     return {
+      isChecking: false,
       form: {
         yard: "",
         bill: "",
@@ -221,17 +248,31 @@ export default {
           }
         ],
         assignTime: [
-          { required: true, message: "请选择派车时间", trigger: "change" }
+          {
+            required: true,
+            validator: checkAssignTime,
+            trigger: "change"
+          }
         ],
         arrivalTime: [
-          { required: true, message: "请选择到厂时间", trigger: "change" }
+          { required: true, validator: checkArrivalTime, trigger: "change" }
         ]
       },
-      info: "查询有无重复提单号...",
+      duplicatedBills: {},
       formLabelWidth: "80px"
     };
   },
   computed: {
+    info() {
+      if (this.isChecking) {
+        return "正在查询有无重复提单号...";
+      } else if (this.duplicatedBills.count > 0) {
+        return `查询到<strong>${this.duplicatedBills.count}</strong>条重复记录，点击查看`;
+      } else if (this.duplicatedBills.count === 0) {
+        return `没有相同提单号记录`;
+      }
+      return "";
+    },
     title() {
       return "增加" + this.direction + "计划";
     },
@@ -286,6 +327,12 @@ export default {
     closeModal() {
       this.$emit("update:status", false);
     },
+    querySearch(queryString, cb, option) {
+      const result = queryString
+        ? option.filter(this.createFilter(queryString))
+        : option;
+      cb(result);
+    },
     async saveNewBill() {
       let result = await this.$refs["form"].validate().catch(err => err);
       if (result) {
@@ -293,14 +340,12 @@ export default {
         payload.vehicleOwner = this.vehicleOwner;
         payload.direction = this.direction;
         payload.operator = "马";
-        const response = await API.post("/bills", payload);
-        if (response.ok) {
+        result = await this.$store.dispatch("bill/addNewBill", payload);
+        if (result) {
           this.$message({
             message: "保存成功",
             type: "success"
           });
-        } else {
-          result = false;
         }
       }
 
@@ -308,25 +353,27 @@ export default {
     },
     async handleSaveAndClose() {
       const result = await this.saveNewBill();
-      if (result) {
-        this.$message({
-          message: "保存成功",
-          type: "success"
-        });
-        this.closeModal();
-      }
+      if (result) this.closeModal();
     },
     async handleSaveAndContinue() {
       const result = await this.saveNewBill();
-      if (result) {
-        this.$refs["form"].resetFields();
-      }
+      if (result) this.$refs["form"].resetFields();
     },
-    querySearch(queryString, cb, option) {
-      const result = queryString
-        ? option.filter(this.createFilter(queryString))
-        : option;
-      cb(result);
+
+    async handleBlurAndCheck() {
+      this.isChecking = true;
+      const response = await API.get(
+        `/check-bill/${this.form.bill.toUpperCase()}`
+      );
+      this.isChecking = false;
+      if (response.ok) {
+        this.duplicatedBills = response.data;
+      } else {
+        this.$message({
+          message: "查询是否存在相同提单号失败，请稍候修改提单号后再试",
+          type: "error"
+        });
+      }
     }
   }
 };

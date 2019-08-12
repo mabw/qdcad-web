@@ -43,6 +43,9 @@ export default {
     "modal-edit-bill": EditBill,
     "modal-edit-carriage": EditCarriageVue
   },
+  created() {
+    this.$store.dispatch("bill/getBillList");
+  },
   data() {
     return {
       showEditBillModal: false,
