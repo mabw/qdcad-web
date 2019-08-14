@@ -2,7 +2,7 @@ import API from "@utils/apiService";
 
 const state = { data: null };
 const mutations = {
-  updateState(state, data) {
+  updateBillListState(state, data) {
     state.data = data;
   }
 };
@@ -12,7 +12,7 @@ const actions = {
     if (!payload) {
       const result = await API.get("/bills");
       if (result.ok) {
-        commit("updateState", result.data);
+        commit("updateBillListState", result.data);
       }
     }
   },
@@ -20,7 +20,7 @@ const actions = {
     if (payload) {
       const result = await API.post("/bills", payload);
       if (result.ok) {
-        commit("updateState", result.data);
+        commit("updateBillListState", result.data);
         return true;
       }
     }
@@ -31,8 +31,8 @@ const actions = {
 
 const getters = {
   filteredBillList: state => filter => {
-    if (!filter) return state;
+    if (!filter) return state.data || [];
   }
 };
 
-export default { namespaced: true, state, mutations, actions, getters };
+export default { state, mutations, actions, getters };

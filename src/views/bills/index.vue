@@ -23,7 +23,6 @@
       <bill-list />
     </template>
     <modal-edit-bill v-if="showEditBillModal" :status.sync="showEditBillModal" direction="出口" />
-    <modal-edit-carriage v-if="showEditBillModal" :status.sync="showCarriageModal" />
   </table-list-slot>
 </template>
 
@@ -32,24 +31,20 @@ import TableListSlot from "@template/TableListSlot";
 import Filter from "./Filter";
 import Bills from "./Bills";
 import EditBill from "./EditBill";
-import EditCarriage from "./EditCarriage";
-import EditCarriageVue from "./EditCarriage.vue";
 
 export default {
   components: {
     "table-list-slot": TableListSlot,
     "filter-form": Filter,
     "bill-list": Bills,
-    "modal-edit-bill": EditBill,
-    "modal-edit-carriage": EditCarriageVue
+    "modal-edit-bill": EditBill
   },
   created() {
-    this.$store.dispatch("bill/getBillList");
+    this.$store.dispatch("getBillList");
   },
   data() {
     return {
-      showEditBillModal: false,
-      showCarriageModal: false
+      showEditBillModal: false
     };
   },
   methods: {
