@@ -12,53 +12,20 @@
     </template>
     <template #list>
       <el-table :data="configurations[type]" style="width: 100%">
-        <el-table-column label="类型" width="150" align="center">
+        <el-table-column :label="title" width="200">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper">
-              <el-radio-group
-                v-if="scope.$index === edittingIndex"
-                v-model="edittingFrozenComputed"
-                size="mini"
-                style="vertical-align: top"
-              >
-                <el-radio-button label="冻柜"></el-radio-button>
-                <el-radio-button label="普柜"></el-radio-button>
-              </el-radio-group>
-              <el-tag v-else-if="scope.row.isFrozen" disable-transitions>冻柜</el-tag>
-              <el-tag v-else-if="!scope.row.isFrozen" disable-transitions type="success">普柜</el-tag>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="尺寸" width="150" align="center">
-          <template slot-scope="scope">
-            <div slot="reference" class="name-wrapper">
-              <span v-if="edittingIndex !== scope.$index">{{ scope.row.size }}</span>
-              <el-radio-group
-                v-else
-                v-model="edittingData.size"
-                size="mini"
-                style="vertical-align: top"
-              >
-                <el-radio-button label="20"></el-radio-button>
-                <el-radio-button label="40"></el-radio-button>
-              </el-radio-group>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="型号" width="100" align="center">
-          <template slot-scope="scope">
-            <div slot="reference" class="name-wrapper">
-              <span v-show="edittingIndex !== scope.$index">{{ scope.row.type }}</span>
+              <span v-show="edittingIndex !== scope.$index">{{ scope.row }}</span>
               <el-input
                 v-show="scope.$index === edittingIndex"
-                v-model="edittingData.type"
+                v-model="edittingData"
                 size="mini"
-                placeholder="型号"
+                placeholder="终点名称"
+                @keyup.native.13="handleUpdate(scope.$index, scope.row)"
               ></el-input>
             </div>
           </template>
         </el-table-column>
-
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
@@ -93,28 +60,9 @@
       </el-table>
     </template>
     <template>
-      <el-form
-        status-icon
-        :inline="true"
-        :rules="rules"
-        ref="formInline"
-        :model="formInline"
-        style="margin-top: 32px"
-      >
-        <el-form-item label="类型" prop="isFrozen" required>
-          <el-radio-group v-model="isFrozenComputed" style="vertical-align: top">
-            <el-radio-button label="冻柜"></el-radio-button>
-            <el-radio-button label="普柜"></el-radio-button>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="尺寸" prop="size">
-          <el-radio-group v-model="formInline.size" style="vertical-align: top">
-            <el-radio-button label="20"></el-radio-button>
-            <el-radio-button label="40"></el-radio-button>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="型号" prop="type">
-          <el-input v-model="formInline.type" placeholder="型号"></el-input>
+      <el-form status-icon :inline="true" :rules="rules" ref="formInline" :model="formInline">
+        <el-form-item :label="title" prop="name">
+          <el-input v-model="formInline.name" placeholder="终点名称"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSaveNew('formInline')">增加</el-button>
@@ -125,7 +73,6 @@
 </template>
 
 <script>
-// 箱型大写
 import ManagementSlot from "@template/ManagemengSlot";
 import { createNamespacedHelpers } from "vuex";
 
@@ -137,57 +84,27 @@ export default {
     "management-slot": ManagementSlot
   },
   computed: {
-    ...mapGetters(["configurations"]),
-    isFrozenComputed: {
-      get: function() {
-        if (this.formInline.isFrozen) {
-          return "冻柜";
-        }
-        return "普柜";
-      },
-      set: function(value) {
-        if (value === "冻柜") this.formInline.isFrozen = true;
-        if (value === "普柜") this.formInline.isFrozen = false;
-      }
-    },
-    edittingFrozenComputed: {
-      get: function() {
-        if (this.edittingData.isFrozen) {
-          return "冻柜";
-        }
-        return "普柜";
-      },
-      set: function(value) {
-        if (value === "冻柜") this.edittingData.isFrozen = true;
-        if (value === "普柜") this.edittingData.isFrozen = false;
-      }
-    }
+    ...mapGetters(["configurations"])
   },
   data() {
     const checkInputValue = (_, value, callback) => {
       if (!value) {
-        return callback(new Error("请输入尺寸或类型名称"));
+        return callback(new Error("请输入终点名称"));
       } else if (
         this.configurations[this.type].findIndex(item => item === value) >= 0
       ) {
-        return callback(new Error("已存在相同箱型"));
+        return callback(new Error("已存在相同终点名称"));
       }
       callback();
     };
     return {
       edittingIndex: null,
-      edittingData: {
-        size: "",
-        type: "",
-        isFrozen: true
-      },
+      edittingData: "",
       formInline: {
-        size: "40",
-        type: "",
-        isFrozen: true
+        name: ""
       },
       rules: {
-        type: [
+        name: [
           { required: true, validator: checkInputValue, trigger: "change" }
         ]
       }
@@ -195,15 +112,11 @@ export default {
   },
   methods: {
     handleRemove(index, data) {
-      console.log("data: ", data);
       this.$refs[`popover-${index}`].doClose();
       const content = new Set(
         JSON.parse(JSON.stringify(this.configurations[this.type]))
       );
-      console.log(Array.from(data));
-      console.log("content: ", Array.from(content));
       content.delete(data);
-      console.log("content: ", Array.from(content));
       const payload = {
         type: this.type,
         content: { data: Array.from(content) }
@@ -221,7 +134,7 @@ export default {
     },
     handleEdit(index, data) {
       this.edittingIndex = index;
-      this.edittingData = JSON.parse(JSON.stringify(data));
+      this.edittingData = data;
     },
     handleUpdate(index, data) {
       if (this.edittingData !== data) {
@@ -245,7 +158,7 @@ export default {
         }
       }
       this.edittingIndex = null;
-      this.edittingData = { size: "", type: "", isFrozen: true };
+      this.edittingData = null;
     },
     handleSaveNew(formInline) {
       this.$refs[formInline].validate(valid => {
@@ -253,7 +166,7 @@ export default {
           const data = new Set(
             JSON.parse(JSON.stringify(this.configurations[this.type]))
           );
-          data.add({ ...this.formInline });
+          data.add(this.formInline.name);
           const payload = {
             type: this.type,
             content: { data: Array.from(data) }

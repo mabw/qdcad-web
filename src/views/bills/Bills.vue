@@ -20,7 +20,7 @@
         <el-table-column label="类型" width="200" align="center">
           <template slot-scope="scope">
             <div>
-              <div>{{scope.row.bill}}sdfsadfasfasdfsfsaf</div>
+              <div>{{scope.row.bill}}</div>
               <el-tag size="mini">{{scope.row.direction}}</el-tag>
             </div>
           </template>

@@ -175,7 +175,7 @@
 <script>
 import API from "@utils/apiService";
 import dayjs from "dayjs";
-
+// TODO: 检查箱型尺寸是否符合规则
 export default {
   props: ["status", "direction"],
   data() {
@@ -340,7 +340,7 @@ export default {
         payload.vehicleOwner = this.vehicleOwner;
         payload.direction = this.direction;
         payload.operator = "马";
-        result = await this.$store.dispatch("bill/addNewBill", payload);
+        result = await this.$store.dispatch("addNewBill", payload);
         if (result) {
           this.$message({
             message: "保存成功",

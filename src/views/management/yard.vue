@@ -80,6 +80,7 @@ export default {
     ...mapGetters(["configurations"])
   },
   data() {
+    // TODO: 检测重名
     return {
       edittingIndex: null,
       edittingData: "",
@@ -101,7 +102,6 @@ export default {
     handleEditYard(index, data) {
       this.edittingIndex = index;
       this.edittingData = data.name;
-      console.log(this.$refs);
     },
     handleUpdateYard(index, data) {
       if (this.edittingData !== data.name) {

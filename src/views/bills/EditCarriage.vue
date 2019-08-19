@@ -1,9 +1,25 @@
 <template>
   <el-dialog :title="title" :visible="status" @close="closeModal" fullscreen center>
-    <el-form :model="form" status-icon :rules="rules" ref="form">
+    <el-row>
+      <el-col :span="24">
+        <el-table :data="billData" style="width: 100%" border>
+          <el-table-column prop="assignTime" label="派车日期"></el-table-column>
+          <el-table-column prop="arrivalTime" label="到厂日期"></el-table-column>
+          <el-table-column prop="bill" label="提单号"></el-table-column>
+          <el-table-column prop="clientName" label="托运单位"></el-table-column>
+          <el-table-column prop="yard" label="场站"></el-table-column>
+          <el-table-column prop="arrival" label="止点地址"></el-table-column>
+          <el-table-column prop="shippingSchedule" label="船期"></el-table-column>
+          <el-table-column prop="containerSpec" label="箱型"></el-table-column>
+          <el-table-column prop="vehicleNumber" label="车号"></el-table-column>
+          <el-table-column prop="vehicleDriver" label="驾驶员"></el-table-column>
+        </el-table>
+      </el-col>
+    </el-row>
+    <el-form :model="form" status-icon :rules="rules" ref="form" class="carriage-form">
       <el-row :gutter="12">
-        <el-col :span="5" :offset="4">
-          <el-form-item label="托运单位（客户名称)" prop="departure">
+        <el-col :span="4" :offset="4">
+          <el-form-item label="托运单位（客户名称）" prop="clientName">
             <el-tooltip effect="dark" content="选择或输入客户名称，新增客户名称会保存到选项中供下次使用" placement="top">
               <el-autocomplete
                 class="w-100"
@@ -14,28 +30,28 @@
             </el-tooltip>
           </el-form-item>
         </el-col>
-        <el-col :span="7">
-          <el-form-item label="货物名称" prop="departure">
+        <el-col :span="6">
+          <el-form-item label="货物名称" prop="carriageName">
             <el-tooltip effect="dark" content="选择或输入货物名称，新增货物名称会保存到选项中供下次使用" placement="top">
               <el-autocomplete
                 class="w-100"
-                v-model="form.clientName"
+                v-model="form.carriageName"
                 :fetch-suggestions="(querySearchString,cb)=>querySearch(querySearchString,cb,clientNameOption)"
                 placeholder="请输入或选择货物名称"
               ></el-autocomplete>
             </el-tooltip>
           </el-form-item>
         </el-col>
-        <el-col :span="2">
-          <el-form-item label="货物重量(吨）" prop="departure">
+        <el-col :span="3">
+          <el-form-item label="货物重量(吨）" prop="carriageWeight">
             <el-tooltip effect="dark" content="选择或输入货物重量，新增货物重量会保存到选项中供下次使用" placement="top">
-              <el-input placeholder="请输入重量" v-model="form.memo"></el-input>
+              <el-input placeholder="请输入货物重量" v-model="form.carriageWeight"></el-input>
             </el-tooltip>
           </el-form-item>
         </el-col>
-        <el-col :span="2">
-          <el-form-item label="运费" prop="departure">
-            <el-input placeholder="请输入运费" v-model="form.memo"></el-input>
+        <el-col :span="3">
+          <el-form-item label="运费单价" prop="carriagePricePerTon">
+            <el-input placeholder="请输入运费单价" v-model="form.carriagePricePerTon"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -45,7 +61,7 @@
             <el-tooltip effect="dark" content="选择或输入起点，新增起点会保存到选项中供下次使用" placement="top">
               <el-autocomplete
                 class="w-100"
-                v-model="form.clientName"
+                v-model="form.departure"
                 :fetch-suggestions="(querySearchString,cb)=>querySearch(querySearchString,cb,clientNameOption)"
                 placeholder="请输入或选择起点"
               ></el-autocomplete>
@@ -112,8 +128,12 @@
 import API from "@utils/apiService";
 import dayjs from "dayjs";
 
+// TODO: 增货物重和货运单位的输入限制和数字验证, 改变下拉项的选项
+// 焦点自动全选，位置靠右
+// 转换场站名字为中文
+
 export default {
-  props: ["status", "direction"],
+  props: ["status", "bill"],
   data() {
     const checkAssignTime = (_, value, callback) => {
       if (!value) {
@@ -138,36 +158,36 @@ export default {
     return {
       isChecking: false,
       form: {
-        yard: "",
-        bill: "",
-        vessel: "",
-        vesselCN: "",
-        voyage: "",
-        containerSpec: "",
-        shippingSchedule: "",
-        measureDock: null,
+        carriageName: "",
+        carriageWeight: "",
+        carriagePricePerTon: "",
+        departure: "",
         arrival: "",
         clientName: "",
         assignTime: "",
         arrivalTime: "",
-        vehicleNumber: "",
-        vehicleDriver: "",
         memo: ""
       },
       rules: {
-        yard: [{ required: true, message: "请选择场站", trigger: "change" }],
-        bill: [{ required: true, message: "请输入提单号", trigger: "change" }],
-        vessel: [{ required: true, message: "请输入船名", trigger: "change" }],
-        voyage: [{ required: true, message: "请输入航次", trigger: "change" }],
-        containerSpec: [
+        carriageName: [
+          { required: true, message: "请选择货物名称", trigger: "change" }
+        ],
+        carriageWeight: [
           {
             required: true,
-            message: "请选择或输入箱型",
+            message: "请输入货物重量",
             trigger: "change"
           }
         ],
-        shippingSchedule: [
-          { required: true, message: "请选择船期", trigger: "change" }
+        carriagePricePerTon: [
+          {
+            required: true,
+            message: "请输入运费单价",
+            trigger: "change"
+          }
+        ],
+        departure: [
+          { required: true, message: "请输入起点", trigger: "change" }
         ],
         arrival: [
           {
@@ -199,26 +219,11 @@ export default {
     };
   },
   computed: {
-    info() {
-      if (this.isChecking) {
-        return "正在查询有无重复提单号...";
-      } else if (this.duplicatedBills.count > 0) {
-        return `查询到<strong>${this.duplicatedBills.count}</strong>条重复记录，点击查看`;
-      } else if (this.duplicatedBills.count === 0) {
-        return `没有相同提单号记录`;
-      }
-      return "";
+    billData() {
+      return [this.bill];
     },
     title() {
       return "增加配货计划";
-    },
-    vehicleOwner() {
-      return "畅安达";
-    },
-    containerSpecOption() {
-      return this.$store.getters[
-        "management/configurations"
-      ].container_spec.map(item => ({ value: item.size + item.type }));
     },
     arrivalOption() {
       return this.$store.getters["management/configurations"].arrival.map(
@@ -229,27 +234,6 @@ export default {
       return this.$store.getters["management/configurations"].client_name.map(
         item => ({ value: item })
       );
-    },
-    yardOption() {
-      return this.$store.getters["management/configurations"].yard.map(
-        item => ({ value: item.identity, label: item.name })
-      );
-    },
-    billComputed: {
-      get: function() {
-        return this.form.bill;
-      },
-      set: function(value) {
-        this.form.bill = value.toUpperCase();
-      }
-    },
-    containerSpecComputed: {
-      get: function() {
-        return this.form.containerSpec;
-      },
-      set: function(value) {
-        this.form.containerSpec = value.toUpperCase();
-      }
     }
   },
   methods: {
@@ -269,14 +253,13 @@ export default {
         : option;
       cb(result);
     },
-    async saveNewBill() {
+    async saveNewCarriage() {
       let result = await this.$refs["form"].validate().catch(err => err);
       if (result) {
         const payload = this.form;
-        payload.vehicleOwner = this.vehicleOwner;
-        payload.direction = this.direction;
+        payload.billId = this.bill.id;
         payload.operator = "马";
-        result = await this.$store.dispatch("bill/addNewBill", payload);
+        result = await this.$store.dispatch("addNewCarriage", payload);
         if (result) {
           this.$message({
             message: "保存成功",
@@ -288,29 +271,19 @@ export default {
       return result;
     },
     async handleSaveAndClose() {
-      const result = await this.saveNewBill();
+      const result = await this.saveNewCarriage();
       if (result) this.closeModal();
     },
     async handleSaveAndContinue() {
-      const result = await this.saveNewBill();
+      const result = await this.saveNewCarriage();
       if (result) this.$refs["form"].resetFields();
-    },
-
-    async handleBlurAndCheck() {
-      this.isChecking = true;
-      const response = await API.get(
-        `/check-bill/${this.form.bill.toUpperCase()}`
-      );
-      this.isChecking = false;
-      if (response.ok) {
-        this.duplicatedBills = response.data;
-      } else {
-        this.$message({
-          message: "查询是否存在相同提单号失败，请稍候修改提单号后再试",
-          type: "error"
-        });
-      }
     }
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.carriage-form {
+  margin-top: 48px;
+}
+</style>
