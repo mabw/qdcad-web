@@ -20,7 +20,7 @@
                 v-show="scope.$index === edittingIndex"
                 v-model="edittingData"
                 size="mini"
-                placeholder="终点名称"
+                :placeholder="title"
                 @keyup.native.13="handleUpdate(scope.$index, scope.row)"
               ></el-input>
             </div>
@@ -62,7 +62,7 @@
     <template>
       <el-form status-icon :inline="true" :rules="rules" ref="formInline" :model="formInline">
         <el-form-item :label="title" prop="name">
-          <el-input v-model="formInline.name" placeholder="终点名称"></el-input>
+          <el-input v-model="formInline.name" :placeholder="title"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSaveNew('formInline')">增加</el-button>
@@ -89,11 +89,11 @@ export default {
   data() {
     const checkInputValue = (_, value, callback) => {
       if (!value) {
-        return callback(new Error("请输入终点名称"));
+        return callback(new Error(`请输入${this.title}`));
       } else if (
         this.configurations[this.type].findIndex(item => item === value) >= 0
       ) {
-        return callback(new Error("已存在相同终点名称"));
+        return callback(new Error(`已存在相同${this.title}`));
       }
       callback();
     };
@@ -111,7 +111,7 @@ export default {
     };
   },
   methods: {
-    handleRemove(index, data) {
+    async handleRemove(index, data) {
       this.$refs[`popover-${index}`].doClose();
       const content = new Set(
         JSON.parse(JSON.stringify(this.configurations[this.type]))
@@ -121,7 +121,7 @@ export default {
         type: this.type,
         content: { data: Array.from(content) }
       };
-      const result = this.$store.dispatch(
+      const result = await this.$store.dispatch(
         "management/saveConfigurations",
         payload
       );
@@ -136,8 +136,18 @@ export default {
       this.edittingIndex = index;
       this.edittingData = data;
     },
-    handleUpdate(index, data) {
+    async handleUpdate(index, data) {
       if (this.edittingData !== data) {
+        const sameDataList = this.configurations[this.type].filter(
+          item => item === this.edittingData
+        );
+        if (sameDataList.length > 0) {
+          this.$message({
+            type: "error",
+            message: `存在重复的${this.title}, 请重新输入`
+          });
+          return;
+        }
         const content = JSON.parse(
           JSON.stringify(this.configurations[this.type])
         );
@@ -146,7 +156,7 @@ export default {
           type: this.type,
           content: { data: content }
         };
-        const result = this.$store.dispatch(
+        const result = await this.$store.dispatch(
           "management/saveConfigurations",
           payload
         );
@@ -160,30 +170,29 @@ export default {
       this.edittingIndex = null;
       this.edittingData = null;
     },
-    handleSaveNew(formInline) {
-      this.$refs[formInline].validate(valid => {
-        if (valid) {
-          const data = new Set(
-            JSON.parse(JSON.stringify(this.configurations[this.type]))
-          );
-          data.add(this.formInline.name);
-          const payload = {
-            type: this.type,
-            content: { data: Array.from(data) }
-          };
-          const result = this.$store.dispatch(
-            "management/saveConfigurations",
-            payload
-          );
-          if (result) {
-            this.$message({
-              type: "success",
-              message: "添加成功"
-            });
-            this.$refs["formInline"].resetFields();
-          }
+    async handleSaveNew(formInline) {
+      let result = await this.$refs[formInline].validate().catch(err => err);
+      if (result) {
+        const data = new Set(
+          JSON.parse(JSON.stringify(this.configurations[this.type]))
+        );
+        data.add(this.formInline.name);
+        const payload = {
+          type: this.type,
+          content: { data: Array.from(data) }
+        };
+        const result = await this.$store.dispatch(
+          "management/saveConfigurations",
+          payload
+        );
+        if (result) {
+          this.$message({
+            type: "success",
+            message: "添加成功"
+          });
+          this.$refs["formInline"].resetFields();
         }
-      });
+      }
     }
   }
 };

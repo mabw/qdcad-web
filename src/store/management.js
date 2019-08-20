@@ -25,7 +25,10 @@ const actions = {
     const result = await API.put("/configurations/1", payload);
     if (result.ok) {
       commit("updateState", result.data);
+      return true;
     }
+
+    return false;
   }
 };
 

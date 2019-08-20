@@ -51,7 +51,7 @@
               <span v-show="edittingIndex !== scope.$index">{{ scope.row.type }}</span>
               <el-input
                 v-show="scope.$index === edittingIndex"
-                v-model="edittingData.type"
+                v-model="edittingTypeComputed"
                 size="mini"
                 placeholder="型号"
               ></el-input>
@@ -114,7 +114,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="型号" prop="type">
-          <el-input v-model="formInline.type" placeholder="型号"></el-input>
+          <el-input v-model="typeComputed" placeholder="型号"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSaveNew('formInline')">增加</el-button>
@@ -138,6 +138,22 @@ export default {
   },
   computed: {
     ...mapGetters(["configurations"]),
+    typeComputed: {
+      get: function() {
+        return this.formInline.type;
+      },
+      set: function(value) {
+        this.formInline.type = value.toUpperCase();
+      }
+    },
+    edittingTypeComputed: {
+      get: function() {
+        return this.edittingData.type;
+      },
+      set: function(value) {
+        this.edittingData.type = value.toUpperCase();
+      }
+    },
     isFrozenComputed: {
       get: function() {
         if (this.formInline.isFrozen) {
@@ -167,9 +183,14 @@ export default {
     const checkInputValue = (_, value, callback) => {
       if (!value) {
         return callback(new Error("请输入尺寸或类型名称"));
-      } else if (
-        this.configurations[this.type].findIndex(item => item === value) >= 0
-      ) {
+      }
+      const sameSizeList = this.configurations[this.type].filter(
+        item => item.size === this.formInline.size
+      );
+      const sameTypeList = sameSizeList.filter(
+        item => item.type === this.formInline.type
+      );
+      if (sameTypeList.length > 0) {
         return callback(new Error("已存在相同箱型"));
       }
       callback();
@@ -194,21 +215,19 @@ export default {
     };
   },
   methods: {
-    handleRemove(index, data) {
-      console.log("data: ", data);
+    async handleRemove(index, rowData) {
       this.$refs[`popover-${index}`].doClose();
-      const content = new Set(
-        JSON.parse(JSON.stringify(this.configurations[this.type]))
+      const content = JSON.parse(
+        JSON.stringify(this.configurations[this.type])
       );
-      console.log(Array.from(data));
-      console.log("content: ", Array.from(content));
-      content.delete(data);
-      console.log("content: ", Array.from(content));
+      const data = content.filter(
+        item => !(item.size === rowData.size && item.type === rowData.type)
+      );
       const payload = {
         type: this.type,
-        content: { data: Array.from(content) }
+        content: { data }
       };
-      const result = this.$store.dispatch(
+      const result = await this.$store.dispatch(
         "management/saveConfigurations",
         payload
       );
@@ -223,8 +242,21 @@ export default {
       this.edittingIndex = index;
       this.edittingData = JSON.parse(JSON.stringify(data));
     },
-    handleUpdate(index, data) {
-      if (this.edittingData !== data) {
+    async handleUpdate(index, data) {
+      if (JSON.stringify(this.edittingData) !== JSON.stringify(data)) {
+        const sameSizeList = this.configurations[this.type].filter(
+          item => item.size === this.edittingData.size
+        );
+        const sameTypeList = sameSizeList.filter(
+          item => item.type === this.edittingData.type
+        );
+        if (sameTypeList.length > 0) {
+          this.$message({
+            type: "error",
+            message: "存在重复的尺寸和型号, 请重新输入"
+          });
+          return;
+        }
         const content = JSON.parse(
           JSON.stringify(this.configurations[this.type])
         );
@@ -233,7 +265,7 @@ export default {
           type: this.type,
           content: { data: content }
         };
-        const result = this.$store.dispatch(
+        const result = await this.$store.dispatch(
           "management/saveConfigurations",
           payload
         );
@@ -247,30 +279,27 @@ export default {
       this.edittingIndex = null;
       this.edittingData = { size: "", type: "", isFrozen: true };
     },
-    handleSaveNew(formInline) {
-      this.$refs[formInline].validate(valid => {
-        if (valid) {
-          const data = new Set(
-            JSON.parse(JSON.stringify(this.configurations[this.type]))
-          );
-          data.add({ ...this.formInline });
-          const payload = {
-            type: this.type,
-            content: { data: Array.from(data) }
-          };
-          const result = this.$store.dispatch(
-            "management/saveConfigurations",
-            payload
-          );
-          if (result) {
-            this.$message({
-              type: "success",
-              message: "添加成功"
-            });
-            this.$refs["formInline"].resetFields();
-          }
+    async handleSaveNew(formInline) {
+      let result = await this.$refs[formInline].validate().catch(err => err);
+      if (result) {
+        const data = JSON.parse(JSON.stringify(this.configurations[this.type]));
+        data.push({ ...this.formInline });
+        const payload = {
+          type: this.type,
+          content: { data }
+        };
+        result = await this.$store.dispatch(
+          "management/saveConfigurations",
+          payload
+        );
+        if (result) {
+          this.$message({
+            type: "success",
+            message: "添加成功"
+          });
+          this.$refs["formInline"].resetFields();
         }
-      });
+      }
     }
   }
 };
