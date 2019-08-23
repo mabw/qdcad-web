@@ -4,16 +4,6 @@
   </div>
 </template>
 
-<script>
-import "./global.css";
-
-export default {
-  created() {
-    this.$store.dispatch("management/getAllConfigurations");
-  }
-};
-</script>
-
 <style>
 body {
   margin: 0;

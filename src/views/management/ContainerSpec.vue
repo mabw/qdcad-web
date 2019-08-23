@@ -114,7 +114,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="型号" prop="type">
-          <el-input v-model="typeComputed" placeholder="型号"></el-input>
+          <el-input v-model.trim="typeComputed" placeholder="型号"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSaveNew('formInline')">增加</el-button>

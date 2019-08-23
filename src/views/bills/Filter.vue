@@ -23,7 +23,7 @@
       </el-select>
       <el-button slot="append" icon="el-icon-search"></el-button>
     </el-input>
-    <el-select v-model="vesselNumbers" multiple collapse-tags size="small" placeholder="按车号筛选">
+    <el-select v-model="vehicleNumbers" multiple collapse-tags size="small" placeholder="按车号筛选">
       <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
     </el-select>
     <el-select v-model="clientName" multiple collapse-tags size="small" placeholder="按客户名称筛选">
@@ -83,7 +83,7 @@ export default {
       rangDate: "",
       searchBillById: "",
       searchType: "currentPage",
-      vesselNumbers: [],
+      vehicleNumbers: [],
       clientName: [],
       direction: [],
       containerType: []

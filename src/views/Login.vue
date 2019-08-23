@@ -20,7 +20,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="密码">
-          <el-input type="password" prop="password" v-model="ruleForm.Password" autocomplete="off"></el-input>
+          <el-input type="password" prop="password" v-model.trim="ruleForm.Password" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('ruleForm')">登陆</el-button>

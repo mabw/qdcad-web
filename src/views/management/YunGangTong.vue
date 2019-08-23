@@ -8,10 +8,10 @@
     </template>
     <el-form status-icon :inline="true" :rules="rules" ref="formInline" :model="formInline">
       <el-form-item label="云港通账号" prop="user">
-        <el-input v-model="formInline.user" placeholder="云港通账号"></el-input>
+        <el-input v-model.trim="formInline.user" placeholder="云港通账号"></el-input>
       </el-form-item>
       <el-form-item label="云港通密码" prop="password">
-        <el-input v-model="formInline.password" placeholder="云港通密码"></el-input>
+        <el-input v-model.trim="formInline.password" placeholder="云港通密码"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleSaveData('formInline')">保存</el-button>

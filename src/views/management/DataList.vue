@@ -62,7 +62,7 @@
     <template>
       <el-form status-icon :inline="true" :rules="rules" ref="formInline" :model="formInline">
         <el-form-item :label="title" prop="name">
-          <el-input v-model="formInline.name" :placeholder="title"></el-input>
+          <el-input v-model.trim="formInline.name" :placeholder="title"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSaveNew('formInline')">增加</el-button>

@@ -25,6 +25,10 @@ export default new Router({
         {
           path: "management",
           component: () => import("./views/management/index.vue")
+        },
+        {
+          path: "vehicles",
+          component: () => import("./views/vehicles/index.vue")
         }
       ]
     },

@@ -14,25 +14,19 @@
       >
         <el-menu-item index="/">运输计划</el-menu-item>
         <el-submenu index="2">
-          <template slot="title"
-            >对账管理</template
-          >
+          <template slot="title">对账管理</template>
           <el-menu-item index="2-1">集箱货对账</el-menu-item>
           <el-menu-item index="2-2">配散货对账</el-menu-item>
         </el-submenu>
         <el-submenu index="3">
-          <template slot="title"
-            >账单管理</template
-          >
-          <el-menu-item index="3-1">应收账</el-menu-item>
-          <el-menu-item index="payment">应付账</el-menu-item>
+          <template slot="title">账单管理</template>
+          <el-menu-item index="3-1">应收账款</el-menu-item>
+          <el-menu-item index="payment">应付账款</el-menu-item>
           <el-menu-item index="3-4">收入汇总</el-menu-item>
         </el-submenu>
         <el-submenu index="4">
-          <template slot="title"
-            >车辆管理</template
-          >
-          <el-menu-item index="4-1">车辆信息</el-menu-item>
+          <template slot="title">车辆管理</template>
+          <el-menu-item index="vehicles">车辆信息</el-menu-item>
           <el-menu-item index="4-2">出车明细</el-menu-item>
         </el-submenu>
         <el-menu-item index="management">选项配置</el-menu-item>
@@ -49,7 +43,13 @@
 </template>
 
 <script>
+import "../global.css";
+
 export default {
+  created() {
+    this.$store.dispatch("management/getAllConfigurations");
+    this.$store.dispatch("getVehicleList");
+  },
   data() {
     return {
       activeIndex: "/"

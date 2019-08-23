@@ -53,10 +53,10 @@
     <template>
       <el-form status-icon :inline="true" :rules="rules" ref="formInline" :model="formInline">
         <el-form-item label="场站名称" prop="name">
-          <el-input v-model="formInline.name" placeholder="场站名称"></el-input>
+          <el-input v-model.trim="formInline.name" placeholder="场站名称"></el-input>
         </el-form-item>
         <el-form-item label="场站标识符" prop="identity">
-          <el-input v-model="formInline.identity" placeholder="场站标识符"></el-input>
+          <el-input v-model.trim="formInline.identity" placeholder="场站标识符"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSaveNewYard('formInline')">增加</el-button>
