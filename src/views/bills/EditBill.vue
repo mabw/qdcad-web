@@ -175,7 +175,10 @@
 <script>
 import API from "@utils/apiService";
 import dayjs from "dayjs";
+
 // TODO: 检查箱型尺寸是否符合规则
+// 箱型大写
+// 取消加载loading
 export default {
   props: ["status", "direction"],
   data() {
@@ -200,7 +203,6 @@ export default {
       callback();
     };
     return {
-      isChecking: false,
       form: {
         yard: "",
         bill: "",
@@ -361,18 +363,18 @@ export default {
     },
 
     async handleBlurAndCheck() {
-      this.isChecking = true;
-      const response = await API.get(
-        `/check-bill/${this.form.bill.toUpperCase()}`
-      );
-      this.isChecking = false;
-      if (response.ok) {
-        this.duplicatedBills = response.data;
-      } else {
-        this.$message({
-          message: "查询是否存在相同提单号失败，请稍候修改提单号后再试",
-          type: "error"
-        });
+      if (this.billComputed) {
+        const response = await API.get(
+          `/check-bill/${this.form.bill.toUpperCase()}`
+        );
+        if (response.ok) {
+          this.duplicatedBills = response.data;
+        } else {
+          this.$message({
+            message: "查询是否存在相同提单号失败，请稍候修改提单号后再试",
+            type: "error"
+          });
+        }
       }
     }
   }

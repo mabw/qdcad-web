@@ -77,6 +77,7 @@
               <el-dropdown-item icon="el-icon-truck" command="assignvehicle">分配车辆</el-dropdown-item>
               <el-dropdown-item icon="el-icon-message" command="sendMessage">发送短信</el-dropdown-item>
               <el-dropdown-item icon="el-icon-search" command="queryTemperature">查询测温</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-tickets" command="editMemo">修改备注</el-dropdown-item>
               <el-dropdown-item icon="el-icon-edit-outline" command="editBill" divided>修改本条</el-dropdown-item>
               <el-dropdown-item icon="el-icon-delete" command="deleteBill">删除本条</el-dropdown-item>
             </el-dropdown-menu>
