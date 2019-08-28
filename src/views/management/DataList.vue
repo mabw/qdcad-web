@@ -74,9 +74,7 @@
 
 <script>
 import ManagementSlot from "@template/ManagemengSlot";
-import { createNamespacedHelpers } from "vuex";
-
-const { mapGetters } = createNamespacedHelpers("management");
+import { mapGetters } from "vuex";
 
 export default {
   props: ["type", "label", "title"],
@@ -121,10 +119,7 @@ export default {
         type: this.type,
         content: { data: Array.from(content) }
       };
-      const result = await this.$store.dispatch(
-        "management/saveConfigurations",
-        payload
-      );
+      const result = await this.$store.dispatch("saveConfigurations", payload);
       if (result) {
         this.$message({
           type: "success",
@@ -157,7 +152,7 @@ export default {
           content: { data: content }
         };
         const result = await this.$store.dispatch(
-          "management/saveConfigurations",
+          "saveConfigurations",
           payload
         );
         if (result) {
@@ -182,7 +177,7 @@ export default {
           content: { data: Array.from(data) }
         };
         const result = await this.$store.dispatch(
-          "management/saveConfigurations",
+          "saveConfigurations",
           payload
         );
         if (result) {

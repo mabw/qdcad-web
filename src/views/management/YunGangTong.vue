@@ -22,9 +22,7 @@
 
 <script>
 import ManagementSlot from "@template/ManagemengSlot";
-import { createNamespacedHelpers } from "vuex";
-
-const { mapGetters } = createNamespacedHelpers("management");
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -64,7 +62,7 @@ export default {
             type: "yun_gang_tong",
             content: { data: { user, password } }
           };
-          this.$store.dispatch("management/saveConfigurations", payload);
+          this.$store.dispatch("saveConfigurations", payload);
         }
       });
     }

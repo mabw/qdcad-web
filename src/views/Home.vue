@@ -47,7 +47,7 @@ import "../global.css";
 
 export default {
   created() {
-    this.$store.dispatch("management/getAllConfigurations");
+    this.$store.dispatch("getAllConfigurations");
     this.$store.dispatch("getVehicleList");
   },
   data() {

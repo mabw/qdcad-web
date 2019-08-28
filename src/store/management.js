@@ -2,10 +2,10 @@ import API from "@utils/apiService";
 
 const state = { data: null };
 const mutations = {
-  initialState(state, data) {
+  initialConfigurationState(state, data) {
     state.data = data;
   },
-  updateState(state, data) {
+  updateConfigurationState(state, data) {
     state.data.forEach(item => {
       if (data.type === item.type) {
         item.content = data.content;
@@ -18,13 +18,13 @@ const actions = {
   async getAllConfigurations({ commit }) {
     const result = await API.get("/configurations");
     if (result.ok) {
-      commit("initialState", result.data);
+      commit("initialConfigurationState", result.data);
     }
   },
   async saveConfigurations({ commit }, payload) {
     const result = await API.put("/configurations/1", payload);
     if (result.ok) {
-      commit("updateState", result.data);
+      commit("updateConfigurationState", result.data);
       return true;
     }
 
@@ -44,4 +44,4 @@ const getters = {
   }
 };
 
-export default { namespaced: true, state, mutations, actions, getters };
+export default { state, mutations, actions, getters };

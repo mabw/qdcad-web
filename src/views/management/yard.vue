@@ -68,9 +68,7 @@
 
 <script>
 import ManagementSlot from "@template/ManagemengSlot";
-import { createNamespacedHelpers } from "vuex";
-
-const { mapGetters } = createNamespacedHelpers("management");
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -117,7 +115,7 @@ export default {
           type: "yard",
           content: { data: content }
         };
-        this.$store.dispatch("management/saveConfigurations", payload);
+        this.$store.dispatch("saveConfigurations", payload);
       }
       this.edittingIndex = null;
       this.edittingData = null;
@@ -134,7 +132,7 @@ export default {
             type: "yard",
             content: { data }
           };
-          this.$store.dispatch("management/saveConfigurations", payload);
+          this.$store.dispatch("saveConfigurations", payload);
         }
       });
     }

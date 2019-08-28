@@ -39,8 +39,8 @@
       </el-table-column>
       <el-table-column prop="assignTime" label="船期" width="100" align="center"></el-table-column>
       <el-table-column prop="containerSpec" label="箱型" width="60" align="center"></el-table-column>
-      <el-table-column label="英文船名" align="center">
-        <el-table-column label="中文船名" align="center">
+      <el-table-column label="英文船名" align="center" width="160">
+        <el-table-column label="中文船名" align="center" width="160">
           <template slot-scope="scope">
             <div>
               <div>{{scope.row.vessel}}</div>

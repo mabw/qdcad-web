@@ -29,7 +29,12 @@
           </el-tooltip>
         </el-col>
         <el-col :span="3">
-          <el-button class="w-100" type="success" icon="el-icon-search" @click="closeModal">查询提单信息</el-button>
+          <el-button
+            class="w-100"
+            type="success"
+            icon="el-icon-search"
+            @click="handleQueryBillInfo"
+          >查询提单信息</el-button>
         </el-col>
         <el-col :span="7">
           <el-alert close-text="知道了" v-if="info" :closable="false" v-html="info">
@@ -47,7 +52,7 @@
         </el-col>
         <el-col :span="4">
           <el-form-item label="中文船名">
-            <el-input v-model="form.vesselCN" placeholder="请填写中文船名" clearable></el-input>
+            <el-input v-model="form.vesselCn" placeholder="请填写中文船名" clearable></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="4">
@@ -79,12 +84,12 @@
           </el-form-item>
         </el-col>
         <el-col :span="4">
-          <el-form-item label="测温码头">
+          <!-- <el-form-item label="测温码头">
             <el-select class="w-100" v-model="form.measureDock" placeholder="请选择测温码头" clearable>
               <el-option label="QQCT" value="QQCT"></el-option>
               <el-option label="QQCTU" value="QQCTU"></el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item>-->
         </el-col>
       </el-row>
       <el-row :gutter="12">
@@ -137,9 +142,19 @@
         <el-col :span="4">
           <el-form-item label="分配车辆">
             <el-tooltip effect="dark" content="如所选车辆不在列表中，需要到选择配置页面添加，可稍候分配车辆" placement="top">
-              <el-select class="w-100" v-model="form.vehicleNumber" placeholder="请选择车辆" clearable>
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
+              <el-select
+                class="w-100"
+                v-model="form.vehicleNumber"
+                placeholder="请选择车辆"
+                clearable
+                @change="handleOnVehicleNumberChange"
+              >
+                <el-option
+                  v-for="item in vehicleNumberOption"
+                  :key="item.value"
+                  :value="item.value"
+                  :label="item.label"
+                ></el-option>
               </el-select>
             </el-tooltip>
           </el-form-item>
@@ -147,8 +162,12 @@
         <el-col :span="4">
           <el-form-item label="驾驶员">
             <el-select class="w-100" v-model="form.vehicleDriver" placeholder="请选择驾驶员" clearable>
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+              <el-option
+                v-for="item in vehicleDriverOption"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label"
+              ></el-option>
             </el-select>
           </el-form-item>
         </el-col>
@@ -163,7 +182,7 @@
           ></el-input>
         </el-form-item>
       </el-row>
-    </el-form>保存更改，删除此记录
+    </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeModal">取消并返回</el-button>
       <el-button @click="handleSaveAndClose" type="primary">保存后返回</el-button>
@@ -179,6 +198,7 @@ import dayjs from "dayjs";
 // TODO: 检查箱型尺寸是否符合规则
 // 箱型大写
 // 取消加载loading
+// 部分更新
 export default {
   props: ["status", "direction"],
   data() {
@@ -207,7 +227,7 @@ export default {
         yard: "",
         bill: "",
         vessel: "",
-        vesselCN: "",
+        vesselCn: "",
         voyage: "",
         containerSpec: "",
         shippingSchedule: "",
@@ -281,25 +301,38 @@ export default {
     vehicleOwner() {
       return "畅安达";
     },
+    vehicleNumberOption() {
+      return this.$store.state.vehicles.data.map(item => ({
+        value: item.vehicleNumber,
+        label: item.vehicleNumber
+      }));
+    },
+    vehicleDriverOption() {
+      return this.$store.state.vehicles.data.map(item => ({
+        value: item.driverName,
+        label: item.driverName
+      }));
+    },
     containerSpecOption() {
-      return this.$store.getters[
-        "management/configurations"
-      ].container_spec.map(item => ({ value: item.size + item.type }));
+      return this.$store.getters["configurations"].container_spec.map(item => ({
+        value: item.size + item.type
+      }));
     },
     arrivalOption() {
-      return this.$store.getters["management/configurations"].arrival.map(
-        item => ({ value: item })
-      );
+      return this.$store.getters["configurations"].arrival.map(item => ({
+        value: item
+      }));
     },
     clientNameOption() {
-      return this.$store.getters["management/configurations"].client_name.map(
-        item => ({ value: item })
-      );
+      return this.$store.getters["configurations"].client_name.map(item => ({
+        value: item
+      }));
     },
     yardOption() {
-      return this.$store.getters["management/configurations"].yard.map(
-        item => ({ value: item.identity, label: item.name })
-      );
+      return this.$store.getters["configurations"].yard.map(item => ({
+        value: item.identity,
+        label: item.name
+      }));
     },
     billComputed: {
       get: function() {
@@ -335,6 +368,41 @@ export default {
         : option;
       cb(result);
     },
+    handleOnVehicleNumberChange() {
+      const vehicleData = this.$store.state.vehicles.data.filter(
+        item => item.vehicleNumber === this.form.vehicleNumber
+      )[0];
+      this.form.vehicleDriver = vehicleData.driverName;
+    },
+    async handleQueryBillInfo() {
+      this.$refs["form"].validateField("yard");
+      this.$refs["form"].validateField("bill");
+      if (this.form.yard && this.form.bill) {
+        const response = await API.get(
+          `/json-bill-info/${this.form.yard}/${this.form.bill.toUpperCase()}`
+        );
+        if (response.ok && response.data.length > 0) {
+          const {
+            vessel,
+            vesselCn,
+            voyage,
+            containerSpec,
+            measureDock
+          } = response.data;
+          this.form.vessel = vessel;
+          this.form.vesselCn = vesselCn;
+          this.form.voyage = voyage;
+          this.form.containerSpec = containerSpec;
+          this.form.measureDock = measureDock;
+        } else {
+          this.$message({
+            message:
+              "未能查询到相关提单号信息，请检查场站和提单号后重试，或手工输入",
+            type: "error"
+          });
+        }
+      }
+    },
     async saveNewBill() {
       let result = await this.$refs["form"].validate().catch(err => err);
       if (result) {
@@ -361,20 +429,21 @@ export default {
       const result = await this.saveNewBill();
       if (result) this.$refs["form"].resetFields();
     },
-
     async handleBlurAndCheck() {
       if (this.billComputed) {
-        const response = await API.get(
-          `/check-bill/${this.form.bill.toUpperCase()}`
-        );
-        if (response.ok) {
-          this.duplicatedBills = response.data;
-        } else {
-          this.$message({
-            message: "查询是否存在相同提单号失败，请稍候修改提单号后再试",
-            type: "error"
-          });
-        }
+        setTimeout(async () => {
+          const response = await API.get(
+            `/check-bill/${this.form.bill.toUpperCase()}`
+          );
+          if (response.ok) {
+            this.duplicatedBills = response.data;
+          } else {
+            this.$message({
+              message: "查询是否存在相同提单号失败，请稍候修改提单号后再试",
+              type: "error"
+            });
+          }
+        }, 200);
       }
     }
   }

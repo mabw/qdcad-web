@@ -226,14 +226,14 @@ export default {
       return "增加配货计划";
     },
     arrivalOption() {
-      return this.$store.getters["management/configurations"].arrival.map(
-        item => ({ value: item })
-      );
+      return this.$store.getters["configurations"].arrival.map(item => ({
+        value: item
+      }));
     },
     clientNameOption() {
-      return this.$store.getters["management/configurations"].client_name.map(
-        item => ({ value: item })
-      );
+      return this.$store.getters["configurations"].client_name.map(item => ({
+        value: item
+      }));
     }
   },
   methods: {
