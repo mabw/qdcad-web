@@ -4,6 +4,7 @@ import management from "./management";
 import bill from "./bill";
 import carriage from "./carriage";
 import vehicles from "./vehicle";
+import plan from "./plan";
 
 Vue.use(Vuex);
 
@@ -14,7 +15,8 @@ export default new Vuex.Store({
     management,
     carriage,
     vehicles,
-    bill
+    bill,
+    plan
   },
   strict: debug
 });

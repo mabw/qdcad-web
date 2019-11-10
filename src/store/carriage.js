@@ -10,7 +10,7 @@ const mutations = {
 const actions = {
   async getCarriageList({ commit }, payload) {
     if (!payload) {
-      const result = await API.get("/bills");
+      const result = await API.get("/carriages");
       if (result.ok) {
         commit("updateCarriageListState", result.data);
       }

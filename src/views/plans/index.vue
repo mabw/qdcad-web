@@ -20,7 +20,7 @@
       <filter-form @onSearch="handleOnSearch"></filter-form>
     </template>
     <template #list>
-      <bill-list />
+      <plan-list />
     </template>
     <modal-edit-bill v-if="showEditBillModal" :status.sync="showEditBillModal" direction="出口" />
   </table-list-slot>
@@ -29,18 +29,18 @@
 <script>
 import TableListSlot from "@template/TableListSlot";
 import Filter from "./Filter";
-import Bills from "./Bills";
+import Plans from "./Plans";
 import EditBill from "./EditBill";
 
 export default {
   components: {
     "table-list-slot": TableListSlot,
     "filter-form": Filter,
-    "bill-list": Bills,
+    "plan-list": Plans,
     "modal-edit-bill": EditBill
   },
   created() {
-    this.$store.dispatch("getBillList");
+    this.$store.dispatch("getPlanList");
   },
   data() {
     return {

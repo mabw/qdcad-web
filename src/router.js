@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import BillList from "./views/bills";
+import BillList from "./views/plans";
 import Home from "./views/Home.vue";
 
 Vue.use(Router);

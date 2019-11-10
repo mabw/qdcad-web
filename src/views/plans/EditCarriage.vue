@@ -125,7 +125,6 @@
 </template>
 
 <script>
-import API from "@utils/apiService";
 import dayjs from "dayjs";
 
 // TODO: 增货物重和货运单位的输入限制和数字验证, 改变下拉项的选项
@@ -273,6 +272,7 @@ export default {
     async handleSaveAndClose() {
       const result = await this.saveNewCarriage();
       if (result) this.closeModal();
+      this.$store.dispatch("getPlanList");
     },
     async handleSaveAndContinue() {
       const result = await this.saveNewCarriage();
